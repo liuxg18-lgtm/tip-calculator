@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tip calculator</title>
+</head>
+<body>
+  <h1>Tip calculator</h1>
+  <!-- input for bill amount, dropdown for tip percent 10 15 20, number of people, a Calculate button, and a result area -->
+  <form id="tip-form">
+    <p>
+      <label for="bill-amount">Bill amount</label><br>
+      <input id="bill-amount" name="bill-amount" type="number" inputmode="decimal" min="0" step="0.01" required>
+    </p>
+    <p>
+      <label for="tip-percent">Tip percent</label><br>
+      <select id="tip-percent" name="tip-percent">
+        <option value="10">10</option>
+        <option value="15" selected>15</option>
+        <option value="20">20</option>
+      </select>
+    </p>
+    <p>
+      <label for="people">Number of people</label><br>
+      <input id="people" name="people" type="number" inputmode="numeric" min="1" step="1" value="1" required>
+    </p>
+    <p>
+      <button type="submit">Calculate</button>
+    </p>
+  </form>
+  <div id="result">The split will show up here.</div>
+  <script>
+    const form = document.getElementById("tip-form");
+    const result = document.getElementById("result");
+
+    function dollarsToCents(raw) {
+      const trimmed = String(raw).trim();
+      const match = trimmed.match(/^(\d+)(?:\.(\d+))?$/);
+      if (!match) return null;
+      const whole = Number(match[1]) * 100;
+      const frac = (match[2] || "").padEnd(3, "0");
+      const cents = Number(frac.slice(0, 2)) + (frac[2] >= "5" ? 1 : 0);
+      return whole + cents;
+    }
+
+    function money(cents) {
+      return (cents / 100).toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+      });
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const billCents = dollarsToCents(document.getElementById("bill-amount").value);
+      const tipPercent = Number(document.getElementById("tip-percent").value);
+      const people = Number(document.getElementById("people").value);
+
+      if (billCents === null) {
+        result.textContent = "Enter a bill amount of zero or more.";
+        return;
+      }
+
+      if (!Number.isInteger(people) || people < 1) {
+        result.textContent = "Enter at least one person.";
+        return;
+      }
+
+      const tipCents = Math.round((billCents * tipPercent) / 100);
+      const totalCents = billCents + tipCents;
+      const eachCents = Math.round(totalCents / people);
+
+      result.replaceChildren();
+      for (const line of [
+        "Tip: " + money(tipCents),
+        "Total: " + money(totalCents),
+        "Each person pays: " + money(eachCents),
+      ]) {
+        const paragraph = document.createElement("p");
+        paragraph.textContent = line;
+        result.appendChild(paragraph);
+      }
+    });
+  </script>
+</body>
+</html>
