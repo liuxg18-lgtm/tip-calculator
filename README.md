@@ -2,7 +2,7 @@
 
 Split a restaurant bill across the table. Enter the bill, pick a 10%, 15%, or 20% tip, say how many people are paying, and press Calculate.
 
-The page is a single unstyled HTML file:
+The page is a single HTML file, shown as a centered card:
 
 `cursor-activities/tip-calculator/index.html`
 
